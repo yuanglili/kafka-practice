@@ -46,7 +46,7 @@ public class Producer implements ProducerService {
         }
     }
 
-    @Scheduled(fixedRate = 100)
+    @Scheduled(fixedRate = 1000)
     public void scheduledSend() {
         sendMessage("key-" + counter, counter, "hello-" + counter);
         counter++;

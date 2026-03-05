@@ -16,6 +16,7 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,13 @@ public class KafkaConfig {
 
     private static final String BOOTSTRAP_SERVERS = "localhost:9092,localhost:9093,localhost:9094";
 
+
+    @Bean
+    public OtlpHttpSpanExporter otlpHttpSpanExporter() {
+        return OtlpHttpSpanExporter.builder()
+                .setEndpoint("http://localhost:4318/v1/traces")
+                .build();
+    }
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
@@ -55,7 +63,9 @@ public class KafkaConfig {
 
     @Bean
     public KafkaTemplate<String, String> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+        KafkaTemplate<String, String> template = new KafkaTemplate<>(producerFactory());
+        template.setObservationEnabled(true);
+        return template;
     }
 
     @Bean
@@ -73,6 +83,7 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.getContainerProperties().setObservationEnabled(true);
         factory.setConcurrency(3);
         return factory;
     }

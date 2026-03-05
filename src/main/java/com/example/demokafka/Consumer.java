@@ -15,6 +15,10 @@ public class Consumer {
     public Consumer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
+    //todo:配一下kakfa的dashborad
+    //todo : 跑一下kafka dashboard 然后看一下多少个 unique event 和 event 的对比
+    //todo: 看一下java的kafka,不用spring boot
+    //todo: 接大量数据的
 
     @KafkaListener(topics = Producer.TOPIC, groupId = "demo-group")
     public void listen(String json) {
